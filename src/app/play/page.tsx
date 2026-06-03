@@ -4079,10 +4079,10 @@ function PlayPageClient() {
         (!currentSource || !currentId || needPreferRef.current) &&
         optimizationEnabled
       ) {
-        // NOTE: 先检查搜索页的预测速缓存，如果有则直接使用预测速结果，跳过漫长的 preferBestSource
+        // NOTE: 先检查搜索页的视频测速缓存（含网速/清晰度/延迟综合评分）
         const pretestCache = readPretestCache(searchTitle || videoTitle);
         const hasValidPretest = pretestCache && pretestCache.results.length > 0 &&
-          pretestCache.results.some(r => r.pingTime > 0);
+          pretestCache.results.some(r => r.score > 0);
 
         // 过滤掉 openlist、所有 emby 源和 xiaoya 源，它们不参与测速
         const sourcesToTest = sourcesInfo.filter(s => {
@@ -4102,23 +4102,21 @@ function PlayPageClient() {
         );
 
         if (hasValidPretest && sourcesToTest.length > 0) {
-          // NOTE: 搜索时已完成预测速，直接使用预测速结果选择延迟最低的源
-          console.log('[Play] 使用搜索预测速结果，跳过优选等待');
-          setLoadingStage('preferring');
-          setLoadingMessage('⚡ 已使用搜索预测速结果，正在选择最佳源...');
+          // NOTE: 搜索时已完成视频测速（网速+清晰度+延迟），按综合评分选最佳源
+          console.log('[Play] 使用搜索视频测速结果，跳过优选等待');
 
           const sorted = sortSourcesByPretest(sourcesToTest, pretestCache!.results);
           detailData = sorted[0];
 
-          // 将预测速结果转换为 precomputedVideoInfo 格式（延迟信息）
+          // 将完整的视频测速结果传递给 UI（清晰度、网速、延迟等）
           const pretestVideoInfoMap = new Map<string, { quality: string; loadSpeed: string; pingTime: number; bitrate: string }>();
           pretestCache!.results.forEach(r => {
             if (r.pingTime > 0) {
               pretestVideoInfoMap.set(r.sourceKey, {
-                quality: '',
-                loadSpeed: '',
+                quality: r.quality || '',
+                loadSpeed: r.loadSpeed || '',
                 pingTime: r.pingTime,
-                bitrate: '',
+                bitrate: r.bitrate || '',
               });
             }
           });
