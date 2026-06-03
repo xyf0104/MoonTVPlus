@@ -1,74 +1,44 @@
 # 无风影视 Docker Compose 配置
-# 支持 Kvrocks 持久化存储，数据不会因容器重启而丢失
+# 使用 GitHub Container Registry 预构建镜像，无需在服务器上编译
 # 使用方式: docker compose up -d
-version: '3.8'
-
 services:
-  # 无风影视主服务
   wufeng-tv:
-    build: .
+    image: ghcr.io/xyf0104/moontvplus:latest
     container_name: wufeng-tv
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       # 站点配置
       - NEXT_PUBLIC_SITE_NAME=无风影视
       # 存储类型：使用 kvrocks 实现持久化
       - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
       # Kvrocks 连接配置
-      - REDIS_HOST=kvrocks
-      - REDIS_PORT=6666
-      # 管理员账号
+      - KVROCKS_URL=redis://wufeng-kvrocks:6666
+      # 管理员账号（请修改为你自己的）
       - USERNAME=admin
       - PASSWORD=admin123
-      # SQLite 数据库路径（挂载卷持久化）
-      - SQLITE_DB_PATH=/app/.data/moontv.db
-      # 离线下载目录
-      - OFFLINE_DOWNLOAD_DIR=/data
-    volumes:
-      # 持久化 SQLite 数据库
-      - wufeng-data:/app/.data
-      # 持久化离线下载内容
-      - wufeng-downloads:/data
-    depends_on:
-      kvrocks:
-        condition: service_healthy
     networks:
       - wufeng-net
+    depends_on:
+      - wufeng-kvrocks
 
   # Kvrocks - Redis 兼容的持久化键值存储
   # NOTE: 相比 Redis，Kvrocks 基于 RocksDB，磁盘友好，适合云服务器部署
-  kvrocks:
+  wufeng-kvrocks:
     image: apache/kvrocks:latest
     container_name: wufeng-kvrocks
     restart: unless-stopped
-    # 不对外暴露端口，仅内部网络访问
-    # 如需调试可取消注释：
-    # ports:
-    #   - "6666:6666"
     volumes:
       # 持久化 Kvrocks 数据
       - kvrocks-data:/var/lib/kvrocks
-    healthcheck:
-      test: ["CMD", "redis-cli", "-p", "6666", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - wufeng-net
-
-volumes:
-  # 应用数据（SQLite 数据库、配置等）
-  wufeng-data:
-    driver: local
-  # 离线下载内容
-  wufeng-downloads:
-    driver: local
-  # Kvrocks 持久化数据
-  kvrocks-data:
-    driver: local
 
 networks:
   wufeng-net:
     driver: bridge
+
+volumes:
+  kvrocks-data:
+    driver: local
