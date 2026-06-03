@@ -35,7 +35,7 @@ const Logo = () => {
       href='/'
       className='flex items-center justify-center h-16 gap-2 select-none hover:opacity-80 transition-opacity duration-200'
     >
-      <img src='/logo.png' alt={siteName} className='h-9 w-9 rounded-lg object-contain' />
+      <img src='/logo.png?v=2' alt={siteName} className='h-9 w-9 rounded-lg object-contain' />
       <span className='text-2xl font-bold text-green-600 tracking-tight'>
         {siteName}
       </span>

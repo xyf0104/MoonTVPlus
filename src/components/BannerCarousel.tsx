@@ -431,7 +431,7 @@ export default function BannerCarousel({
         className={`relative w-full ${bannerHeightClassMap[bannerHeightScale]} bg-gradient-to-b from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 overflow-hidden flex items-center justify-center`}
       >
         <Image
-          src='/logo.png'
+          src='/logo.png?v=2'
           alt='无风影视'
           width={120}
           height={120}

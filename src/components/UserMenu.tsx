@@ -4602,7 +4602,7 @@ export const UserMenu: React.FC = () => {
                 <div className='flex items-start gap-4'>
                   <div className='flex-shrink-0 relative'>
                     <img
-                      src='/logo.png'
+                      src='/logo.png?v=2'
                       alt='无风影视-PC'
                       className='w-16 h-16 rounded-xl object-cover'
                     />
