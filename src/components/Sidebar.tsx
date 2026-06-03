@@ -27,14 +27,15 @@ const SidebarContext = createContext<SidebarContextType>({
 
 export const useSidebar = () => useContext(SidebarContext);
 
-// 可替换为你自己的 logo 图片
+// 侧栏 Logo 组件：图片 + 站名
 const Logo = () => {
   const { siteName } = useSite();
   return (
     <Link
       href='/'
-      className='flex items-center justify-center h-16 select-none hover:opacity-80 transition-opacity duration-200'
+      className='flex items-center justify-center h-16 gap-2 select-none hover:opacity-80 transition-opacity duration-200'
     >
+      <img src='/logo.png' alt={siteName} className='h-9 w-9 rounded-lg object-contain' />
       <span className='text-2xl font-bold text-green-600 tracking-tight'>
         {siteName}
       </span>
