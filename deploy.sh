@@ -164,6 +164,24 @@ done
 echo ""
 if docker compose ps | grep -q "running"; then
     log_info "🎉 无风影视部署成功！"
+
+    # ---- 10. 清理旧资源 ----
+    log_step "清理旧版残留..."
+    # 清理不再使用的旧镜像
+    docker image prune -af 2>/dev/null || true
+    # 清理旧版 docker-compose.yml（如果新代码不在原目录根）
+    if [ -n "$EXISTING_DIR" ] && [ "$EXISTING_DIR" != "$REPO_DIR" ]; then
+        # 备份旧的 compose 文件以防万一
+        if [ -f "$EXISTING_DIR/docker-compose.yml" ]; then
+            mv "$EXISTING_DIR/docker-compose.yml" "$EXISTING_DIR/docker-compose.yml.bak" 2>/dev/null || true
+            log_info "旧版 docker-compose.yml 已备份为 .bak"
+        fi
+        if [ -f "$EXISTING_DIR/docker-compose.yaml" ]; then
+            mv "$EXISTING_DIR/docker-compose.yaml" "$EXISTING_DIR/docker-compose.yaml.bak" 2>/dev/null || true
+        fi
+    fi
+    log_info "旧版镜像和残留已清理"
+
     echo ""
     echo "  ┌─────────────────────────────────────────┐"
     echo "  │  🌐 本地访问: http://localhost:3000      │"
@@ -189,3 +207,4 @@ else
     log_error "服务启动失败，请查看日志:"
     echo "  cd $REPO_DIR && docker compose logs"
 fi
+
