@@ -1,0 +1,71 @@
+# 自动同步上游 MoonTVPlus 更新
+# 每天凌晨3点自动检查原版更新，合并到你的 fork 并自动重新构建部署
+# 只合并代码更改，不影响运行时数据库和配置
+name: 同步上游更新
+
+on:
+  schedule:
+    # 每天凌晨3点 (UTC+8) 自动检查
+    - cron: '0 19 * * *'
+  # 也支持手动触发
+  workflow_dispatch:
+
+jobs:
+  sync-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 配置 Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: 添加上游仓库
+        run: |
+          git remote add upstream https://github.com/mtvpls/MoonTVPlus.git || true
+          git fetch upstream main
+
+      - name: 检查是否有新更新
+        id: check
+        run: |
+          UPSTREAM_COMMITS=$(git rev-list HEAD..upstream/main --count)
+          echo "new_commits=$UPSTREAM_COMMITS" >> $GITHUB_OUTPUT
+          if [ "$UPSTREAM_COMMITS" -gt 0 ]; then
+            echo "📦 发现 $UPSTREAM_COMMITS 个上游新提交"
+          else
+            echo "✅ 已是最新，无需同步"
+          fi
+
+      - name: 合并上游更新
+        if: steps.check.outputs.new_commits > 0
+        run: |
+          # 使用 merge 而非 rebase，保留你的定制修改
+          # 冲突时优先保留你的版本（品牌、Logo 等定制内容）
+          git merge upstream/main \
+            --no-edit \
+            -m "chore: 自动同步上游更新 $(date +%Y-%m-%d)" \
+            -X ours || {
+              echo "⚠️ 合并冲突，尝试自动解决..."
+              # 品牌相关文件冲突时，保留我们的版本
+              git checkout --ours \
+                public/logo.png \
+                public/icons/ \
+                public/favicon.ico \
+                public/favicon-32.png \
+                docker-compose.yml \
+                src/lib/source-pretest.ts \
+                src/app/api/source-pretest/route.ts \
+                .env \
+                2>/dev/null || true
+              git add -A
+              git commit --no-edit -m "chore: 自动同步上游更新（自动解决冲突）"
+            }
+
+      - name: 推送更新
+        if: steps.check.outputs.new_commits > 0
+        run: git push origin main
