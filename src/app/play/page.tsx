@@ -1702,6 +1702,10 @@ function PlayPageClient() {
   const [corsFailedUrl, setCorsFailedUrl] = useState<string | null>(null);
   // 标记当前视频是否已经尝试过代理（防止 415→直连→失败→代理 的无限循环）
   const proxyAttemptedRef = useRef(false);
+  // NOTE: 播放失败自动换源 - 记录已失败的源，最多自动重试 3 次
+  const autoRetryCountRef = useRef(0);
+  const failedSourcesRef = useRef<Set<string>>(new Set());
+  const MAX_AUTO_RETRY = 3;
   const videoUrlRequestSeqRef = useRef(0);
   const lastVideoRequestKeyRef = useRef<string | null>(null);
 
@@ -6416,6 +6420,30 @@ function PlayPageClient() {
 
                         // 原有的错误处理逻辑
                         hls.destroy();
+
+                        // NOTE: 播放失败自动换源 - 当前源不可用时自动切换到下一个
+                        const currentKey = `${currentSourceRef.current}-${currentIdRef.current}`;
+                        failedSourcesRef.current.add(currentKey);
+
+                        if (autoRetryCountRef.current < MAX_AUTO_RETRY && availableSources.length > 1) {
+                          const nextSource = availableSources.find(s => {
+                            const key = `${s.source}-${s.id}`;
+                            return !failedSourcesRef.current.has(key);
+                          });
+
+                          if (nextSource) {
+                            autoRetryCountRef.current++;
+                            console.log(`[AutoRetry] 源 ${currentSourceRef.current} 播放失败，自动切换到 ${nextSource.source_name}（第 ${autoRetryCountRef.current} 次）`);
+                            // 触发换源
+                            const newParams = new URLSearchParams(searchParams.toString());
+                            newParams.set('source', nextSource.source);
+                            newParams.set('id', nextSource.id);
+                            router.replace(`/play?${newParams.toString()}`);
+                            return;
+                          }
+                        }
+
+                        // 所有自动重试都失败了，显示错误
                         if (statusCode === 403) {
                           setVideoError('访问被拒绝 (403)');
                         } else if (statusCode === 404) {
