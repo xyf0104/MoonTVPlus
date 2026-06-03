@@ -4124,10 +4124,10 @@ function PlayPageClient() {
           });
           setPrecomputedVideoInfo(pretestVideoInfoMap);
         } else if (sourcesToTest.length > 0) {
-          // 没有预测速缓存，回退到原有的 preferBestSource 流程
-          setLoadingStage('preferring');
-          setLoadingMessage('⚡ 正在优选最佳播放源...');
-          detailData = await preferBestSource(sourcesToTest);
+          // NOTE: 没有预测速缓存时直接用第一个源播放，不再走漫长的 preferBestSource
+          // 这样从首页/分类页点击影片也能秒开，无需等待"正在优选"
+          console.log('[Play] 无预测速缓存，直接使用第一个可用源');
+          detailData = sourcesToTest[0];
         } else if (excludedSources.length > 0) {
           detailData = excludedSources[0];
         } else {
