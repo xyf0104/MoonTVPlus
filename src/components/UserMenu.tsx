@@ -1424,7 +1424,7 @@ export const UserMenu: React.FC = () => {
       localStorage.setItem('filesystemSavePath', dirHandle.name);
 
       // 保存目录句柄到 IndexedDB
-      const dbName = 'MoonTVPlus';
+      const dbName = '无风影视';
       const storeName = 'dirHandles';
 
       // 使用 Promise 包装 IndexedDB 操作
@@ -4244,7 +4244,7 @@ export const UserMenu: React.FC = () => {
                 </div>
               </div>
               <p className='mt-5 text-sm leading-6 text-slate-600 dark:text-slate-400'>
-                可直接作为 MoonTV Plus 电视端使用，适合安装到 Android TV / 电视盒子。
+                可直接作为 无风影视 电视端使用，适合安装到 Android TV / 电视盒子。
               </p>
               <div className='mt-5'>
                 <h5 className='mb-2 text-sm font-bold text-slate-700 dark:text-slate-300'>
@@ -4597,13 +4597,13 @@ export const UserMenu: React.FC = () => {
           {/* 应用列表 */}
           <div className='flex-1 overflow-y-auto p-6'>
             <div className='grid gap-6 md:grid-cols-1'>
-              {/* MoonTVPlus-PC 客户端 */}
+              {/* 无风影视-PC 客户端 */}
               <div className='bg-gray-50 dark:bg-gray-800 rounded-lg p-5 border border-gray-200 dark:border-gray-700'>
                 <div className='flex items-start gap-4'>
                   <div className='flex-shrink-0 relative'>
                     <img
                       src='/logo.png'
-                      alt='MoonTVPlus-PC'
+                      alt='无风影视-PC'
                       className='w-16 h-16 rounded-xl object-cover'
                     />
                     <div className='absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg'>
@@ -4612,13 +4612,13 @@ export const UserMenu: React.FC = () => {
                   </div>
                   <div className='flex-1 min-w-0'>
                     <h4 className='text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2'>
-                      MoonTVPlus-PC客户端
+                      无风影视-PC客户端
                     </h4>
                     <p className='text-sm text-gray-600 dark:text-gray-400 mb-3'>
                       专为Windows开发的客户端，完美支持私人影库mkv视频
                     </p>
                     <a
-                      href='https://github.com/mtvpls/MoonTVPlus-PC/releases'
+                      href='https://github.com/mtvpls/无风影视-PC/releases'
                       target='_blank'
                       rel='noopener noreferrer'
                       className='inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors'

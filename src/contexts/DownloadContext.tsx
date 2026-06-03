@@ -177,7 +177,7 @@ export function DownloadProvider({ children }: { children: React.ReactNode }) {
         let dirHandle: FileSystemDirectoryHandle | undefined;
 
         if (downloadMode === 'filesystem') {
-          const dbName = 'MoonTVPlus';
+          const dbName = '无风影视';
           const storeName = 'dirHandles';
 
           dirHandle = await new Promise<FileSystemDirectoryHandle | undefined>((resolve) => {
@@ -305,7 +305,7 @@ export function DownloadProvider({ children }: { children: React.ReactNode }) {
       // 如果是 filesystem 模式，检查是否已经下载过
       if (downloadMode === 'filesystem' && typeof window !== 'undefined' && metadata?.source && metadata?.videoId && metadata?.episodeIndex !== undefined) {
         try {
-          const dbName = 'MoonTVPlus';
+          const dbName = '无风影视';
           const storeName = 'dirHandles';
 
           const alreadyDownloaded = await new Promise<boolean>((resolve) => {
@@ -381,7 +381,7 @@ export function DownloadProvider({ children }: { children: React.ReactNode }) {
       // 如果是 filesystem 模式，从 IndexedDB 读取目录句柄
       if (downloadMode === 'filesystem' && typeof window !== 'undefined') {
         try {
-          const dbName = 'MoonTVPlus';
+          const dbName = '无风影视';
           const storeName = 'dirHandles';
 
           // 使用 Promise 包装 IndexedDB 操作，确保在启动任务前完成

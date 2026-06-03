@@ -432,7 +432,7 @@ export default function BannerCarousel({
       >
         <Image
           src='/logo.png'
-          alt='MoonTVPlus'
+          alt='无风影视'
           width={120}
           height={120}
           className='opacity-50'

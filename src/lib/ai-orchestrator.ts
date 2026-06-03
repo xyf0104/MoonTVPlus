@@ -699,7 +699,7 @@ export async function orchestrateDataSources(
   const now = new Date();
   const utc8Date = new Date(now.getTime() + 8 * 60 * 60 * 1000);
   const today = utc8Date.toISOString().split('T')[0]; // YYYY-MM-DD格式
-  let systemPrompt = `你是 MoonTVPlus 的 AI 影视助手，专门帮助用户发现和了解影视内容。
+  let systemPrompt = `你是 无风影视 的 AI 影视助手，专门帮助用户发现和了解影视内容。
 
 ## 当前日期
 ${today}

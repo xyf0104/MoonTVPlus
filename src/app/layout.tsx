@@ -31,14 +31,14 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata(): Promise<Metadata> {
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
   const config = await getConfig();
-  let siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'MoonTVPlus';
+  let siteName = process.env.NEXT_PUBLIC_SITE_NAME || '无风影视';
   if (storageType !== 'localstorage') {
     siteName = config.SiteConfig.SiteName;
   }
 
   return {
     title: siteName,
-    description: '影视聚合',
+    description: '无风影视 - 影视聚合播放器',
     manifest: '/manifest.json',
   };
 }
@@ -54,7 +54,7 @@ export default async function RootLayout({
 }) {
   const storageType = process.env.NEXT_PUBLIC_STORAGE_TYPE || 'localstorage';
 
-  let siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'MoonTVPlus';
+  let siteName = process.env.NEXT_PUBLIC_SITE_NAME || '无风影视';
   let announcement =
     process.env.ANNOUNCEMENT ||
     '本网站仅提供影视信息搜索服务，所有内容均来自第三方网站。本站不存储任何视频资源，不对任何内容的准确性、合法性、完整性负责。';

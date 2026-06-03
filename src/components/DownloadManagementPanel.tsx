@@ -76,7 +76,7 @@ export function DownloadManagementPanel({ isOpen, onClose }: DownloadManagementP
         if (task.downloadMode === 'filesystem') {
           try {
             // 从 IndexedDB 读取目录句柄
-            const dbName = 'MoonTVPlus';
+            const dbName = '无风影视';
             const storeName = 'dirHandles';
 
             const dirHandle = await new Promise<FileSystemDirectoryHandle | undefined>((resolve) => {

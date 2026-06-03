@@ -223,7 +223,7 @@ export default function AIChatPanel({
   isOpen,
   onClose,
   context,
-  welcomeMessage = '你好！我是MoonTVPlus的AI影视助手，有什么可以帮你的吗？',
+  welcomeMessage = '你好！我是无风影视的AI影视助手，有什么可以帮你的吗？',
   onStreamingChange,
   useDrawer = false,
   drawerWidth = 'w-full md:w-[25%]',

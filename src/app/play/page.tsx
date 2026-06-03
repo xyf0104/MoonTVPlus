@@ -63,6 +63,7 @@ import {
 import { getTMDBImageUrl } from '@/lib/tmdb.search';
 import { DanmakuFilterConfig, EpisodeFilterConfig, SearchResult } from '@/lib/types';
 import { base58Decode, getVideoResolutionFromM3u8, processImageUrl } from '@/lib/utils';
+import { readPretestCache, sortSourcesByPretest } from '@/lib/source-pretest';
 import { useEnableAIComments } from '@/hooks/useEnableAIComments';
 import { useEnableComments } from '@/hooks/useEnableComments';
 import { usePlaySync } from '@/hooks/usePlaySync';
@@ -2211,7 +2212,7 @@ function PlayPageClient() {
   ): Promise<{ hasLocal: boolean; dirHandle?: FileSystemDirectoryHandle }> => {
     try {
       // 从 IndexedDB 读取目录句柄
-      const dbName = 'MoonTVPlus';
+      const dbName = 'WufengTV';
       const storeName = 'dirHandles';
 
       return new Promise((resolve) => {
@@ -4078,23 +4079,17 @@ function PlayPageClient() {
         (!currentSource || !currentId || needPreferRef.current) &&
         optimizationEnabled
       ) {
-        setLoadingStage('preferring');
-        setLoadingMessage('⚡ 正在优选最佳播放源...');
+        // NOTE: 先检查搜索页的预测速缓存，如果有则直接使用预测速结果，跳过漫长的 preferBestSource
+        const pretestCache = readPretestCache(searchTitle || videoTitle);
+        const hasValidPretest = pretestCache && pretestCache.results.length > 0 &&
+          pretestCache.results.some(r => r.pingTime > 0);
 
         // 过滤掉 openlist、所有 emby 源和 xiaoya 源，它们不参与测速
         const sourcesToTest = sourcesInfo.filter(s => {
-          // 检查是否为 openlist
           if (s.source === 'openlist') return false;
-
-          // 检查是否为 emby 源（包括 emby 和 emby_xxx 格式）
           if (s.source === 'emby' || s.source.startsWith('emby_')) return false;
-
-          // 检查是否为 xiaoya 源
           if (s.source === 'xiaoya') return false;
-
-          // 脚本源详情懒加载，不参与测速
           if (s.source.startsWith('script:')) return false;
-
           return true;
         });
 
@@ -4106,10 +4101,34 @@ function PlayPageClient() {
           s.source.startsWith('script:')
         );
 
-        if (sourcesToTest.length > 0) {
+        if (hasValidPretest && sourcesToTest.length > 0) {
+          // NOTE: 搜索时已完成预测速，直接使用预测速结果选择延迟最低的源
+          console.log('[Play] 使用搜索预测速结果，跳过优选等待');
+          setLoadingStage('preferring');
+          setLoadingMessage('⚡ 已使用搜索预测速结果，正在选择最佳源...');
+
+          const sorted = sortSourcesByPretest(sourcesToTest, pretestCache!.results);
+          detailData = sorted[0];
+
+          // 将预测速结果转换为 precomputedVideoInfo 格式（延迟信息）
+          const pretestVideoInfoMap = new Map<string, { quality: string; loadSpeed: string; pingTime: number; bitrate: string }>();
+          pretestCache!.results.forEach(r => {
+            if (r.pingTime > 0) {
+              pretestVideoInfoMap.set(r.sourceKey, {
+                quality: '',
+                loadSpeed: '',
+                pingTime: r.pingTime,
+                bitrate: '',
+              });
+            }
+          });
+          setPrecomputedVideoInfo(pretestVideoInfoMap);
+        } else if (sourcesToTest.length > 0) {
+          // 没有预测速缓存，回退到原有的 preferBestSource 流程
+          setLoadingStage('preferring');
+          setLoadingMessage('⚡ 正在优选最佳播放源...');
           detailData = await preferBestSource(sourcesToTest);
         } else if (excludedSources.length > 0) {
-          // 如果只有懒加载详情的源，直接使用第一个
           detailData = excludedSources[0];
         } else {
           detailData = sourcesInfo[0];

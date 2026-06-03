@@ -796,7 +796,7 @@ export const changelog: ChangelogEntry[] = [
     changed: [
     "IOS全屏体验优化",
     "站点配置中的注册相关配置移动到了新的注册配置大项中",
-    "默认站名从MoonTV改为MoonTVPlus",
+    "默认站名从MoonTV改为无风影视",
     "用户管理现在会给oidc注册的用户显示oidc标识"
     ],
     fixed: [

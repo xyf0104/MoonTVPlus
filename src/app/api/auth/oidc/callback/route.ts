@@ -40,9 +40,9 @@ async function generateSignature(
 function getDeviceInfo(userAgent: string): string {
   const ua = userAgent.toLowerCase();
 
-  // 检查是否为 MoonTVPlus APP
-  if (ua.includes('moontvplus')) {
-    return 'MoonTVPlus APP';
+  // 检查是否为 无风影视 APP
+  if (ua.includes('moontvplus') || ua.includes('wufengtv')) {
+    return '无风影视 APP';
   }
 
   // 检查是否为 OrionTV

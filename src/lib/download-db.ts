@@ -44,7 +44,7 @@ export interface CompletedTask {
   downloadMode: 'browser' | 'filesystem';
 }
 
-const DB_NAME = 'MoonTVPlus';
+const DB_NAME = '无风影视';
 const DB_VERSION = 2;
 const ACTIVE_TASKS_STORE = 'activeTasks';
 const COMPLETED_TASKS_STORE = 'completedTasks';

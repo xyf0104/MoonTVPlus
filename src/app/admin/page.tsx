@@ -14576,7 +14576,7 @@ const AIConfigComponent = ({
               value={defaultMessageNoVideo}
               onChange={(e) => setDefaultMessageNoVideo(e.target.value)}
               rows={3}
-              placeholder='例如：你好！我是MoonTVPlus的AI影视助手。想看什么电影或剧集？需要推荐吗？'
+              placeholder='例如：你好！我是无风影视的AI影视助手。想看什么电影或剧集？需要推荐吗？'
               className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100'
             />
             <p className='mt-2 text-sm text-gray-600 dark:text-gray-400'>
@@ -14722,7 +14722,7 @@ const MusicConfigComponent = ({
             • 音乐功能基于 lxserver 提供搜索、热搜、榜单、歌词与播放解析能力
           </p>
           <p>
-            • 建议填写服务端 Base URL 与持久 Token，由 MoonTV 服务端代为访问
+            • 建议填写服务端 Base URL 与持久 Token，由无风影视服务端代为访问
             lxserver
           </p>
           <p>

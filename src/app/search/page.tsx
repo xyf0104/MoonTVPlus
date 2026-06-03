@@ -45,6 +45,7 @@ import SearchResultFilter, {
 import SearchSuggestions from '@/components/SearchSuggestions';
 import VideoCard, { VideoCardHandle } from '@/components/VideoCard';
 import VirtualScrollableGrid from '@/components/VirtualScrollableGrid';
+import { pretestSources, SourcePretestResult } from '@/lib/source-pretest';
 
 type SearchCachePayload = {
   status: 'complete' | 'partial';
@@ -92,6 +93,10 @@ function SearchPageClient() {
   const pendingResultsRef = useRef<SearchResult[]>([]);
   const flushTimerRef = useRef<number | null>(null);
   const [useFluidSearch, setUseFluidSearch] = useState(true);
+  // NOTE: 预测速相关状态 - 搜索时同步测速，播放时跳过优选等待
+  const pretestAbortRef = useRef<AbortController | null>(null);
+  const [pretestResults, setPretestResults] = useState<SourcePretestResult[]>([]);
+  const pretestAccumulatorRef = useRef<SearchResult[]>([]);
   // 聚合卡片 refs 与聚合统计缓存
   const groupRefs = useRef<Map<string, React.RefObject<VideoCardHandle>>>(
     new Map()
@@ -1246,6 +1251,9 @@ function SearchPageClient() {
               case 'start':
                 setTotalSources(payload.totalSources || 0);
                 setCompletedSources(0);
+                // NOTE: 搜索开始时重置预测速状态
+                pretestAccumulatorRef.current = [];
+                setPretestResults([]);
                 break;
               case 'source_result': {
                 setCompletedSources((prev) => prev + 1);
@@ -1263,6 +1271,8 @@ function SearchPageClient() {
                       ? sortBatchForNoOrder(payload.results as SearchResult[])
                       : (payload.results as SearchResult[]);
                   pendingResultsRef.current.push(...incoming);
+                  // NOTE: 累积结果用于预测速
+                  pretestAccumulatorRef.current.push(...(payload.results as SearchResult[]));
                   if (!flushTimerRef.current) {
                     flushTimerRef.current = window.setTimeout(() => {
                       const toAppend = pendingResultsRef.current;
@@ -1303,6 +1313,13 @@ function SearchPageClient() {
                     setCachedResults(trimmed, prev);
                     return prev;
                   });
+                }
+                // NOTE: 搜索完成后启动预测速（使用累积的所有结果）
+                if (pretestAccumulatorRef.current.length > 0) {
+                  const accumulated = pretestAccumulatorRef.current;
+                  pretestSources(accumulated, trimmed, (result) => {
+                    setPretestResults((prev) => [...prev, result]);
+                  }).catch((err) => console.error('[Pretest] 预测速失败:', err));
                 }
                 setIsLoading(false);
                 try {
@@ -1357,6 +1374,10 @@ function SearchPageClient() {
               setCachedResults(trimmed, results);
               setTotalSources(1);
               setCompletedSources(1);
+              // NOTE: 传统搜索完成后也启动预测速
+              pretestSources(results, trimmed, (result) => {
+                setPretestResults((prev) => [...prev, result]);
+              }).catch((err) => console.error('[Pretest] 预测速失败:', err));
             }
             setIsLoading(false);
           })
