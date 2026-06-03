@@ -1,47 +1,39 @@
 #!/bin/bash
 # ============================================
-# 无风影视 - 无感升级脚本
-# 使用方式: bash update.sh
+# 无风影视 - 手动升级脚本
 # 
-# 原理：
-# 1. 拉取最新代码并构建新镜像
-# 2. 用新镜像替换旧容器
-# 3. 数据存在 Docker 卷中，不受容器更换影响
-# 4. 整个过程停机时间 < 5 秒
+# 当网页提示"有更新"时，在 VPS 上运行:
+#   bash update.sh
+# 
+# 或者直接用一键命令:
+#   curl -sSL https://raw.githubusercontent.com/xyf0104/MoonTVPlus/main/deploy.sh | bash
+#
+# 两个命令效果相同，都会保留数据
 # ============================================
 
 set -e
 
-PROJECT_DIR="/opt/wufeng-tv"
-cd "$PROJECT_DIR"
-
-echo "🔄 无风影视 - 无感升级"
+echo "🔄 无风影视 - 升级到最新版本"
 echo "=========================="
+echo ""
 
-# 1. 拉取最新代码
+# 找到安装目录
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
+
 echo "📥 拉取最新代码..."
-if [ -d "MoonTVPlus" ]; then
-    cd MoonTVPlus
-    git pull origin main
-    cd ..
-else
-    git clone https://github.com/xyf0104/MoonTVPlus.git
-fi
+git fetch origin main
+git reset --hard origin/main
 
-# 2. 构建新镜像（不影响正在运行的旧容器）
-echo "🏗️  构建新镜像..."
-docker compose build --no-cache wufeng-tv
+echo "🏗️  重新构建镜像..."
+docker compose build --no-cache
 
-# 3. 用新镜像无缝替换旧容器（停机 < 5 秒）
-echo "🔄 替换容器（数据不受影响）..."
-docker compose up -d --force-recreate --no-deps wufeng-tv
+echo "🔄 替换容器（数据不受影响，停机 < 10 秒）..."
+docker compose up -d --force-recreate
 
-# 4. 清理旧镜像
 echo "🧹 清理旧镜像..."
 docker image prune -f
 
 echo ""
-echo "✅ 升级完成！"
-echo "🌐 服务已恢复运行: http://$(curl -s ifconfig.me 2>/dev/null || echo 'YOUR_IP'):3000"
-echo ""
+echo "✅ 升级完成！服务已恢复运行"
 echo "📋 查看日志: docker compose logs -f wufeng-tv"
