@@ -6603,7 +6603,8 @@ function PlayPageClient() {
                 return newVal;
               },
             }] : []),
-            ...(webGPUSupported ? [
+            // NOTE: 移动端 GPU 性能不足以支撑实时超分，隐藏超分菜单避免卡顿
+            ...(webGPUSupported && !(typeof window !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) ? [
               {
                 name: 'Anime4K超分',
                 html: 'Anime4K超分',
