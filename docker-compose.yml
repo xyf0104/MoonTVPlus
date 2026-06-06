@@ -6,8 +6,8 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - USERNAME=wufeng
-      - PASSWORD=xyf159753
+      - USERNAME=${TV_USERNAME}
+      - PASSWORD=${TV_PASSWORD}
       - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
       - KVROCKS_URL=redis://wufeng-kvrocks:6666
     networks:
