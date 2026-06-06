@@ -4,10 +4,10 @@ services:
     container_name: wufeng-tv
     restart: on-failure
     ports:
-      - '3000:3000'
+      - '${TV_PORT:-3000}:3000'
     environment:
-      - USERNAME=${TV_USERNAME}
-      - PASSWORD=${TV_PASSWORD}
+      - USERNAME=${TV_USERNAME:-admin}
+      - PASSWORD=${TV_PASSWORD:?请通过 install.sh 设置密码}
       - NEXT_PUBLIC_STORAGE_TYPE=kvrocks
       - KVROCKS_URL=redis://wufeng-kvrocks:6666
     networks:
