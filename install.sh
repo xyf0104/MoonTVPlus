@@ -4,16 +4,15 @@ set -e
 mkdir -p /opt/moontv && cd /opt/moontv
 # 下载 docker-compose.yml
 curl -sSL https://raw.githubusercontent.com/xyf0104/MoonTVPlus/main/docker-compose.yml -o docker-compose.yml
-# 交互式输入账号密码（从 /dev/tty 读取，兼容 curl | bash）
 echo "========== 无风影视 配置 =========="
-read -p "请输入用户名: " TV_USERNAME < /dev/tty
+read -p "请输入用户名: " TV_USERNAME
 while [ -z "$TV_USERNAME" ]; do
-    read -p "用户名不能为空，请重新输入: " TV_USERNAME < /dev/tty
+    read -p "用户名不能为空，请重新输入: " TV_USERNAME
 done
-read -s -p "请输入密码: " TV_PASSWORD < /dev/tty
+read -s -p "请输入密码: " TV_PASSWORD
 echo
 while [ -z "$TV_PASSWORD" ]; do
-    read -s -p "密码不能为空，请重新输入: " TV_PASSWORD < /dev/tty
+    read -s -p "密码不能为空，请重新输入: " TV_PASSWORD
     echo
 done
 # 写入 .env 文件
